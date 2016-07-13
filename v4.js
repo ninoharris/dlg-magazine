@@ -23,10 +23,9 @@ var regexHeader = /(mobile?)/
 var containsBlur = false // If a blur image is used, ask if we want to make it category header
 
 // Configuration
-var archive = "/Users/santurninoharris/lessons/dlg-magazine/"
-var resultsFolder = "/Users/santurninoharris/sites/t3-dl-reboot/html/desktop/lib/img/magazine/" // The folder in which renamed images are put MUST CONTAIN TRAILING /
-
-
+var config = require('./config.json');
+var archive = config.archive
+var resultsFolder = config.resultsFolder // The folder in which renamed images are put MUST CONTAIN TRAILING /
 
 
 
