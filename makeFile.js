@@ -18,7 +18,7 @@ var post = {}
 
 do {
     post["article-category"] = prompt('Category (driving/lifestyle/home-and-garden): ');
-} while(post["article-category"] !== "driving" && post["article-category"] !== "lifestyle" && post["article-category"] !== "home=and-garden")
+} while(post["article-category"] !== "driving" && post["article-category"] !== "lifestyle" && post["article-category"] !== "home-and-garden")
 
 if(post["article-category"] === "driving") {
     product = "car-insurance/"

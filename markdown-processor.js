@@ -7,7 +7,7 @@ var split = require('split')
 
 // REGEX
 var imgRegex = /IMG/
-var urlRegex = /href="([^"]+)"/
+var urlRegex = /href="([^"]+)"/g
 
 // INPUT/OUTPUT
 var fileIn = fs.createReadStream(process.argv[2])

@@ -6,16 +6,13 @@
 
 // Dependencies
 var fs = require('fs') // Filesystem
+var mkdirp = require('mkdirp') // Creates output directory
 var prompt = require('prompt-sync')({
     history: require('prompt-sync-history')(),
     sigint: true
 })
-var mkdirp = require('mkdirp') // Creates output directory
 
-// Input
-var dirName = process.argv[2]
-var type = process.argv[3]
-var articleName = process.argv[4] // Used for naming header files
+var post = {}
 
 // Regexes for renaming names
 var regexNormal = /(.+)(desktop|mobile)-.+\.jpg/
@@ -26,31 +23,30 @@ var regexHeader = /(mobile?)/
 var containsBlur = false // If a blur image is used, ask if we want to make it category header
 
 // Configuration
+var archive = "/Users/santurninoharris/lessons/dlg-magazine/"
 var resultsFolder = "/Users/santurninoharris/sites/t3-dl-reboot/html/desktop/lib/img/magazine/" // The folder in which renamed images are put MUST CONTAIN TRAILING /
+
+// Get directory
+do {
+    post["dirName"] = prompt('What is the directory of the article?  ');
+} while(!post["dirName"].length && fs.accessSync(archive + post["dirName"]))
+
+// // Get type
+// if (type != "driving" && type !== "lifestyle" && type !== "homegarden") {
+//     throw new Error("Type was not given properly, instead got:" + type)
+// }
+do {
+    post["article-category"] = prompt('Category (driving/lifestyle/homegarden): ');
+} while(post["article-category"] !== "driving" && post["article-category"] !== "lifestyle" && post["article-category"] !== "homegarden")
 
 var introMessage = "----------------------" +
 "\n--- CHECK BEFORE SAYING YES" +
-"\n--- Category: " + type +
-"\n--- DirName: " + dirName +
+"\n--- Category: " + post["article-category"] +
+"\n--- DirName: " + post["dirName"] +
 "\n--- Output folder: " + resultsFolder +
 "\n----------------------\n\n"
 
-// Set console input to utf8 to avoid weird stuff
-process.stdin.setEncoding('utf8')
-
-// Input must include directory name, and type
-if (!dirName || !(dirName.length >0) ) { // if no dirName specified
-    throw new Error("Directory name was not given, instead got: " + dirName)
-}
-
-// type is used to replace header name for category pages
-if (type != "driving" && type !== "lifestyle" && type !== "homegarden") {
-    throw new Error("Type was not given properly, instead got:" + type)
-}
-
-prompt.start()
-
-fs.readdir(dirName, // get files under the dirName specified
+fs.readdir(post["dirName"], // get files under the dirName specified
     function (err, files) { // callback containing the files from fs.readdir
         if (err) throw new Error("Nino says you have an error getting the files: " + err)
 
@@ -58,18 +54,18 @@ fs.readdir(dirName, // get files under the dirName specified
 
         prelimTest(files)
 
-        // Checks to see if user is okay with what's changing
-        rl.question('You should have 2 header files minimum and 2 blurs if a category top post. \nReady to go? (y/yes)',
-        function (answer) {
-            rl.close()
-            if (answer !== "yes" && answer !== "y") {
-                console.error("JUMP SHIP SHE'S SINKING")
-                process.exit()
-            } else {
-                "LETS GO!"
-                renameFiles(files)
-            }
-        })
+        // // Checks to see if user is okay with what's changing
+        // rl.question('You should have 2 header files minimum and 2 blurs if a category top post. \nReady to go? (y/yes)',
+        // function (answer) {
+        //     rl.close()
+        //     if (answer !== "yes" && answer !== "y") {
+        //         console.error("JUMP SHIP SHE'S SINKING")
+        //         process.exit()
+        //     } else {
+        //         "LETS GO!"
+        //         renameFiles(files)
+        //     }
+        // })
 
 
     }
@@ -106,7 +102,7 @@ function renameFiles(files) {
             newFilename = replaceBlur(file) + version + ".jpg"
             DLCopyFile(dirName + file, "", newFilename)
         } else if (use === "header") {
-            newFilename = replaceHeader(file) + version + ".jpg"
+            newFilename = replaceHeader(file) + 'header' + version + ".jpg"
             DLCopyFile(dirName + file, "article/", newFilename)
         } else if (use === "body") {
             newFilename = replaceBody(file) + version + ".jpg"
