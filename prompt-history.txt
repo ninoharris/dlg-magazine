@@ -4,4 +4,3 @@ j
 test-garden-safe
 test-safe-garden
 test-garden-shed
-mosquito-bites

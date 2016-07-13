@@ -113,8 +113,8 @@ function prelimTest(files) {
 
 
 
-
-
+var input = ""
+var output = ""
 
 function renameFiles(files) {
     for(var i = 0; i < files.length; i++) {
@@ -137,10 +137,14 @@ function renameFiles(files) {
             DLCopyFile(file, "article/", newFilename)
         }
 
-        console.log(newFilename)
-        console.log( post["dirName"] + newFilename)
+        input += newFilename + "\n"
+        output += post["dirName"] + newFilename + "\n"
 
     }
+
+    console.log("INPUT: \n" + input)
+    console.log("\nOUTPUT: \n" + output)
+
 }
 
 function imagePurpose(filename) {
@@ -175,7 +179,6 @@ function getScreenType(filename) {
 // copies file to source in specified folder.
 function DLCopyFile(file, folder, fileName) {
     var path = trailingSlash(archive) + trailingSlash(post["release"]) + trailingSlash(post["article-folder"]) + file
-    console.log(path)
     copyFile(path, resultsFolder + folder + fileName)
 }
 
@@ -217,4 +220,12 @@ function checkDirectory(directory) {
 
 function trailingSlash(str) {
     return str.replace(/\/$/,"") + "/"
+}
+
+function createFileIfDoesntExist(file) {
+    try {
+        fs.accessSync(file)
+    } catch (e) {
+        fs.writeFileSync(file)
+    }
 }

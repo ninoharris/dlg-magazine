@@ -43,3 +43,6 @@ app/css
 
 # Config file for Local folders
 config.json
+
+# history file
+prompt-history.txt
