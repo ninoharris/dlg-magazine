@@ -8,7 +8,7 @@
 var fs = require('fs') // Filesystem
 var mkdirp = require('mkdirp') // Creates output directory
 var prompt = require('prompt-sync')({
-    history: require('prompt-sync-history')(),
+    history: require('prompt-sync-history')("prompt-history.txt"),
     sigint: true
 })
 
@@ -26,10 +26,25 @@ var containsBlur = false // If a blur image is used, ask if we want to make it c
 var archive = "/Users/santurninoharris/lessons/dlg-magazine/"
 var resultsFolder = "/Users/santurninoharris/sites/t3-dl-reboot/html/desktop/lib/img/magazine/" // The folder in which renamed images are put MUST CONTAIN TRAILING /
 
-// Get directory
+
+
+
+
+// Get directories
 do {
-    post["dirName"] = prompt('What is the directory of the article?  ');
-} while(!post["dirName"].length && fs.accessSync(archive + post["dirName"]))
+    post["release"] = prompt('What is the directory of the release (eg JUL14)?  ')
+    prompt.history.save();
+} while( !post["release"].length || checkArchiveDirectory(post["release"]) === false )
+console.log("Release directory found: " + post["release"])
+
+do {
+    post["article-folder"] = prompt('What is the directory of the article? (eg garden-shed-safe)  ')
+    post["dirName"] = trailingSlash(post["release"]) + post["article-folder"]
+    prompt.history.save();
+} while( !post["article-folder"].length || checkArchiveDirectory(post["dirName"]) === false )
+console.log("Article directory found: " + post["dirName"])
+
+
 
 // // Get type
 // if (type != "driving" && type !== "lifestyle" && type !== "homegarden") {
@@ -53,6 +68,20 @@ fs.readdir(post["dirName"], // get files under the dirName specified
         console.log(introMessage)
 
         prelimTest(files)
+
+        // User checks output of prelimTest, if they write "y" then we do stuff
+        var isReady = false
+        do {
+            isReady = prompt("Are we ready to go ahead (y/n)")==="y" ? true : false
+        } while (isReady === false)
+
+        console.log("Lets go!")
+
+        post["article-name"] = post["article-folder"] // CHANGE MEEEEEEE
+        post["isCategoryHeader"] = prompt("Will this be the header for the category of " + post["article-category"] + " (y)?  ") === "y" ? true : false
+        post["isMagazineHeader"] = prompt("Will this be the header for the magazine landing (y)?  ") === "y" ? true : false
+
+        renameFiles(files)
 
         // // Checks to see if user is okay with what's changing
         // rl.question('You should have 2 header files minimum and 2 blurs if a category top post. \nReady to go? (y/yes)',
@@ -98,33 +127,21 @@ function renameFiles(files) {
         var use = imagePurpose(file)
 
         if (use === "blur") {
-            containsBlur = true
-            newFilename = replaceBlur(file) + version + ".jpg"
-            DLCopyFile(dirName + file, "", newFilename)
+            if( post["isCategoryHeader"] || post["isMagazineHeader"] )
+                newFilename = replaceBlur(file, post) + version + ".jpg"
+                DLCopyFile(file, "", newFilename)
         } else if (use === "header") {
-            newFilename = replaceHeader(file) + 'header' + version + ".jpg"
-            DLCopyFile(dirName + file, "article/", newFilename)
+            newFilename = replaceHeader(file) + version + ".jpg"
+            DLCopyFile(file, "article/", newFilename)
         } else if (use === "body") {
             newFilename = replaceBody(file) + version + ".jpg"
-            DLCopyFile(dirName + file, "article/", newFilename)
+            DLCopyFile(file, "article/", newFilename)
         }
 
         console.log(newFilename)
-        console.log(dirName + resultsFolder + newFilename)
+        console.log( post["dirName"] + newFilename)
 
     }
-}
-
-function replaceBlur(fileName) {
-    return type + "-background-"
-}
-function replaceBody(fileName) {
-    var result = regexNormal.exec(fileName)
-    var bodyImageName = result[1] // before desktop/mobile bit
-    return bodyImageName // will return "XXXXX-body-"
-}
-function replaceHeader(fileName) {
-    return articleName + "-"
 }
 
 function imagePurpose(filename) {
@@ -132,6 +149,19 @@ function imagePurpose(filename) {
     if (filename.indexOf('blur') > -1) return "blur"
     if (filename.indexOf('header') > -1) return "header"
     return "body"
+}
+function replaceBlur(fileName, post) {
+    if (post["isMagazineHeader"])
+        return "latest-background-"
+    return post["article-category"] + "-background-"
+}
+function replaceBody(fileName) {
+    var result = regexNormal.exec(fileName)
+    var bodyImageName = result[1] // before desktop/mobile bit
+    return bodyImageName // will return "XXXXX-body-"
+}
+function replaceHeader(fileName) {
+    return post["article-name"] + "-" + 'header' + "-"
 }
 
 // Returns "m" for mobile, "d" for desktop
@@ -143,8 +173,11 @@ function getScreenType(filename) {
     }
 }
 
-function DLCopyFile(source, folder, fileName) {
-    copyFile(source, resultsFolder + folder + fileName)
+// copies file to source in specified folder.
+function DLCopyFile(file, folder, fileName) {
+    var path = trailingSlash(archive) + trailingSlash(post["release"]) + trailingSlash(post["article-folder"]) + file
+    console.log(path)
+    copyFile(path, resultsFolder + folder + fileName)
 }
 
 function copyFile(source, target) {
@@ -168,4 +201,21 @@ function copyFile(source, target) {
       cbCalled = true;
     }
   }
+}
+
+function checkArchiveDirectory(directory) {
+    return checkDirectory(archive + directory)
+}
+//function will check if a directory exists, and create it if it doesn't
+function checkDirectory(directory) {
+  try {
+      fs.readdirSync(directory)
+      return true
+  } catch (e) {
+      return false
+  }
+}
+
+function trailingSlash(str) {
+    return str.replace(/\/$/,"") + "/"
 }
