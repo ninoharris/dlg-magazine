@@ -1,11 +1,20 @@
-var http = require('http')
-var fs = require('fs')
-var formidable = require('formidable')
-var util = require('util')
+const http = require('http')
+const fs = require('fs')
+const formidable = require('formidable')
+const util = require('util')
 const Handlebars = require('handlebars')
+const marked = require('marked')
 
 const config = require('./config.json')
 const OUTPUT_PATH = config["desktopPath"]
+
+
+
+
+const imgRegex = /IMG/
+const urlRegex = /href="([^"]+)"/g
+
+
 
 var server = http.createServer(function (req, res) {
     if (req.method.toLowerCase() == 'get') {
@@ -18,37 +27,47 @@ var server = http.createServer(function (req, res) {
 })
 const PORT = 1185
 
-function displayForm(res) {
+function displayForm(res, fields) {
     fs.readFile('form.html', function (err, data) {
         res.writeHead(200, {
             'Content-Type': 'text/html',
             'Content-Length': data.length
         })
-        res.write(data)
+
+        if(!fields) fields = {}
+
+        var formTemplate = Handlebars.compile(data.toString())
+        var output = formTemplate(fields)
+
+        res.write(output)
         res.end()
     })
 }
 
 function processAllFieldsOfTheForm(req, res) {
     var form = new formidable.IncomingForm()
-
+    var whatTheUserTypedIn
     form.parse(req, function (err, fields) {
         res.writeHead(200, {
             'content-type': 'text/plain'
         })
-
-        console.log("process all", fields)
+        whatTheUserTypedIn = fields
+        console.log(whatTheUserTypedIn)
+        // console.log("process all", fields)
 
         createFile(fields)
 
         res.write('received the data:\n\n')
-        res.end(JSON.stringify(fields))
-
+        res.write(JSON.stringify(fields))
+        res.end()
     })
+    // displayForm(res, whatTheUserTypedIn)
 }
 
 function createFile(fields) {
     fields["product-capital"] = capitalizeFirstLetter(fields["product"])
+    console.log(fields["markdown-entry"])
+    fields["markdown-entry"] = getHTMLFomMarkdown(fields["markdown-entry"])
 
     var url = fields.url
     var category = fields.category
@@ -63,17 +82,16 @@ function createFile(fields) {
 
     var outputFilePath = getOutputFilePath(category, url, product)
 
-    var productionPath = getProductionPath(category, url, product)
-
     fs.writeFile(outputFilePath, result, function(err) {
         if (err) {
             return console.log(err)
         }
-        console.log("The file was saved under", outputFilePath)
+        console.log("The file was saved at", outputFilePath)
     })
 
+    // Open up page
     var spawn = require('child_process').spawn
-    spawn('open', [productionPath]);
+    spawn('open', [getProductionPath(category, url, product)]);
 
 }
 
@@ -116,6 +134,24 @@ function getCategoryFilePath(category, product) {
 function capitalizeFirstLetter(string) {
     return string.charAt(0).toUpperCase() + string.slice(1);
 }
+
+
+
+
+function getHTMLFomMarkdown(content) {
+    var lines = content.split("\n")
+    var result = lines.map(convertLine).join("\n")
+    return result
+}
+
+function convertLine(line) {
+    return includeBlank(marked(line))
+}
+
+
+
+
+
 
 
 
