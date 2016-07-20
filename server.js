@@ -43,6 +43,7 @@ function processAllFieldsOfTheForm(req, res) {
 
         res.write('received the data:\n\n')
         res.end(JSON.stringify(fields))
+
     })
 }
 
@@ -62,12 +63,18 @@ function createFile(fields) {
 
     var outputFilePath = getOutputFilePath(category, url, product)
 
+    var productionPath = getProductionPath(category, url, product)
+
     fs.writeFile(outputFilePath, result, function(err) {
         if (err) {
             return console.log(err)
         }
         console.log("The file was saved under", outputFilePath)
     })
+
+    var spawn = require('child_process').spawn
+    spawn('open', [productionPath]);
+
 }
 
 function getTemplateFromCategory(category) {
@@ -82,23 +89,28 @@ function getTemplateFromCategory(category) {
 }
 
 function getOutputFilePath(category, url, product) {
+    categoryFilePath = getCategoryFilePath(category, product)
+
+    console.log(OUTPUT_PATH + categoryFilePath + url + ".html")
+    return OUTPUT_PATH + categoryFilePath + url + ".html"
+}
+
+function getProductionPath(category, url, product) {
+    categoryFilePath = getCategoryFilePath(category, product)
+    return "http://dev.directline.com/" + categoryFilePath + url + ".html"
+}
+
+function getCategoryFilePath(category, product) {
     var categoryFilePath
-    if(category === 'driving')
-        categoryFilePath = OUTPUT_PATH + "car-insurance/driving/"
-    if(category === 'homegarden')
-        categoryFilePath = OUTPUT_PATH + "home-insurance/home-and-garden/"
-    if(category === 'lifestyle') {
-        if (product === 'pet') {
-            categoryFilePath = OUTPUT_PATH + "pet-insurance/lifestyle/"
-        } else if (product === 'life') {
-            categoryFilePath = OUTPUT_PATH + "life-insurance/lifestyle/"
-        } else if (product === 'travel') {
-            categoryFilePath = OUTPUT_PATH + "travel-insurance/lifestyle/"
+    if (category === 'driving') categoryFilePath = "car-insurance/driving/"
+    if (category === 'homegarden') categoryFilePath = "home-insurance/home-and-garden/"
+    if (category === 'lifestyle') {
+        if (product === 'pet') { categoryFilePath = "pet-insurance/lifestyle/"
+        } else if (product === 'life') { categoryFilePath = "life-insurance/lifestyle/"
+        } else if (product === 'travel') { categoryFilePath = "travel-insurance/lifestyle/"
         }
     }
-
-    console.log(categoryFilePath + url + ".html")
-    return categoryFilePath + url + ".html"
+    return categoryFilePath
 }
 
 function capitalizeFirstLetter(string) {
