@@ -1,0 +1,69 @@
+<!--#set var="section-id-primary" value="magazine" -->
+<!--#set var="section-id-secondary" value="driving" -->
+
+<!--#set var="page-title" value="{{meta-title}} – Direct Line" -->
+<!--#set var="page-description" value="{{meta-description}}" -->
+<!--#set var="page-image" value="https://www.directline.com/lib/img/magazine/article/{{page-image}}-m.jpg" -->
+<!--#set var="article-author" value="{{author}}" -->
+<!--#set var="article-date" value="{{date}}" -->
+<!--#set var="article-heading" value="{{h1}}" -->
+<!--#set var="article-category" value="driving" -->
+
+<!--#include virtual="/common/_htmlstart_magazine.html"-->
+<a name="top"></a>
+<!--#include virtual="/common/_headerstart.html"-->
+<!--#include virtual="/common/magazine/_menu.html"-->
+<!--#include virtual="/common/_headerend_magazine.html"-->
+
+
+<main class="article driving" role="main">
+
+    <!-- HEADER -->
+    <!--#include virtual="/common/magazine/_article-header.html"-->
+    <div class="banner {{banner-class}}"></div>
+
+    <!-- BREADCRUMBS -->
+    <div class="grey-light-background">
+        <div class="row">
+            <div class="small-12 columns">
+                <ul class="breadcrumbs" itemprop="breadcrumb">
+                    <li><a href="/">Home</a></li>
+                    <li><a href="/car-insurance">Car Insurance</a></li>
+                    <li><a href="/car-insurance/driving">Driving</a></li>
+                    <li>
+                        <a href="/car-insurance/driving/{{url}}"><strong>{{breadcrumbs}}</strong></a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+
+    <div class="article-body">
+        <div class="row">
+            <section class="small-12 large-8 columns">
+
+
+                <p><!--#include virtual="/common/magazine/_share-icons.html"--></p>
+
+                <div class="show-for-small-only other-sections">
+                    <!--#include virtual="/common/magazine/_other-sections.html"-->
+                </div>
+
+
+            </section>
+            <aside class="small-12 large-3 end large-push-1 columns">
+                <!--#include virtual="/common/magazine/_new-videos.html"-->
+                <!--#include virtual="/common/magazine/_right-column.html"-->
+            </aside>
+        </div>
+    </div>
+
+    <div class="hide-for-small other-sections">
+        <!--#include virtual="/common/magazine/_other-sections.html"-->
+    </div>
+
+</main>
+
+<!--#include virtual="/common/_footer.html"-->
+<!--#include virtual="/common/_htmlend.html"-->

@@ -1,0 +1,76 @@
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+</head>
+<body>
+    <form action="" method="post" enctype="multipart/form-data">
+        <div class="meta">
+            <label for="meta-title">Title</label><input type="text" name="meta-title">
+            <label for="meta-description">Description</label><input type="text" name="meta-description">
+            <label for="author">Author</label><input type="text" name="author">
+            <label for="url">URL <span>eg 5-family-cars-with-cool-features</span></label><input type="text" name="url">
+            <label for="category">Category</label>
+            <select name="category" id="">
+                <option value="driving">Driving</option>
+                <option value="homegarden">Home and Garden</option>
+                <option value="lifestyle">Lifestyle</option>
+            </select>
+            <label for="product">Product</label>
+            <select name="product" id="">
+                <option value="car">Car</option>
+                <option value="home">Home</option>
+                <option value="pet">Pet</option>
+                <option value="life">Life</option>
+                <option value="travel">Travel</option>
+            </select>
+            <label for="h1">H1 title</label><input type="text" name="h1">
+            <label for="breadcrumbs">Breadcrumbs</label><input type="text" name="breadcrumbs">
+            <label for="date">Date <span>(14 July 2016)</span></label><input type="text" name="date">
+            <label for="page-image">Page image <span>(eg 5-family-cars-header for https://www.directline.com/lib/img/magazine/article/5-family-cars-header-m.jpg)</span></label><input type="text" name="page-image">
+            <label for="banner-class">Banner class <span>(eg hd-5-family-cars)</span></label><input type="text" name="banner-class">
+        </div>
+        <div class="markdown">
+            <textarea name="markdown-entry" id="" cols="130" rows="80"></textarea>
+        </div>
+        <input type="submit" value="Create file" />
+    </form>
+    <style>
+        body {
+            margin: 50px;
+            font-fize: 14px;
+            font-family: helvetica, sans-serif;
+            line-height: 1.5em;
+        }
+        .meta {
+            width: 300px;
+        }
+        .meta, .markdown, input[type="submit"] {
+            float: left;
+            margin-right: 60px;
+        }
+        input, textarea, select {
+            margin-bottom: 30px;
+        }
+        input, select {
+            height: 30px;
+            width: 300px;
+            display: block;
+
+        }
+        textarea {
+
+        }
+        input[type="submit"] {
+            height: 40px;
+        }
+        span {
+            font-size: 12px;
+            color: grey;
+            display: block;
+        }
+    </style>
+</body>
+</html>

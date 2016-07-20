@@ -138,7 +138,7 @@ function renameFiles(files) {
         }
 
         input += newFilename + "\n"
-        output += post["dirName"] + newFilename + "\n"
+        output += trailingSlash(post["dirName"]) + newFilename + "\n"
 
     }
 
