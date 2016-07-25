@@ -4,14 +4,26 @@ const formidable = require('formidable')
 const util = require('util')
 const Handlebars = require('handlebars')
 const marked = require('marked')
+const colours = require('colors')
 
 const config = require('./config.json')
-const OUTPUT_PATH = config["desktopPath"]
+const OUTPUT_PATH = ts(config["desktopPath"])
+const imgTemplate = ('./image-include-template.html')
 
 
 
+const imgRegex = /IMG *([\w-_\/]+?)-? *"(.*)"?/
+// https://regex101.com/r/vD9vB0/1
+// IMG *	IMG followed by any amount of spaces
+// ()		capture content inside, this is the filename
+// [\w-_\/]	Any letter, hyphen or forward-slash
+// +? 		For any length > 1, but non-greedy.
+//					This is to ignore a final "-" which will be added later
+// ()-?		An optional dash can be used, but is NOT part of the text capture
+//  *		any number of spaces
+// "(.*)"?	Anything between quotes is captured for alt tag.
+//					question mark at end allows for incomplete quote
 
-const imgRegex = /IMG/
 const urlRegex = /href="([^"]+)"/g
 
 
@@ -109,13 +121,13 @@ function getTemplateFromCategory(category) {
 function getOutputFilePath(category, url, product) {
     categoryFilePath = getCategoryFilePath(category, product)
 
-    console.log(OUTPUT_PATH + categoryFilePath + url + ".html")
-    return OUTPUT_PATH + categoryFilePath + url + ".html"
+    console.log(OUTPUT_PATH + ts(categoryFilePath) + url + ".html")
+    return OUTPUT_PATH + ts(categoryFilePath) + url + ".html"
 }
 
 function getProductionPath(category, url, product) {
     categoryFilePath = getCategoryFilePath(category, product)
-    return "http://dev.directline.com/" + categoryFilePath + url + ".html"
+    return ts("http://dev.directline.com/") + ts(categoryFilePath) + url + ".html"
 }
 
 function getCategoryFilePath(category, product) {
@@ -128,7 +140,7 @@ function getCategoryFilePath(category, product) {
         } else if (product === 'travel') { categoryFilePath = "travel-insurance/lifestyle/"
         }
     }
-    return categoryFilePath
+    return ts(categoryFilePath)
 }
 
 function capitalizeFirstLetter(string) {
@@ -140,17 +152,50 @@ function capitalizeFirstLetter(string) {
 
 function getHTMLFomMarkdown(content) {
     var lines = content.split("\n")
-    var result = lines.map(convertLine).join("\n")
+    var result = lines.map(convertLine).join()
     return result
 }
 
 function convertLine(line) {
-    return includeBlank(marked(line))
+	var newLine
+	if(line.toUpperCase().indexOf("IMG ") > -1) {
+		newLine = includeImg(line)
+	} else {
+		newLine = includeBlank(marked(line))
+	}
+    return "\t\t\t\t" + newLine // Adds in tabs for editing later on
 }
 
+function includeImg (line) {
+	var imgProps = line.match(imgRegex)
+	if(imgProps.length) {
+		var templateData = {
+			"img-name": imgProps[1],
+			"img-title": imgProps[2]
+		}
+		try {
+			doBothImagesExist(templateData["img-name"])
+			var template = Handlebars.compile(fs.readFileSync(imgTemplate, 'utf-8'))
+			return template(templateData)
+		} catch(e) {
+			throw new Error("Something went wrong with including the image: " + templateData["img-name"], e)
+		}
+	} else {
+		return line
+	}
+}
 
+function doBothImagesExist(imgName) {
 
+	fs.access("dev.directline.com/" + ts("lib/img/") + imgName + "-body-m.jpg", doesImageExist)
+	fs.access("dev.directline.com/" + ts("lib/img/") + imgName + "-body-d.jpg", doesImageExist)
 
+	function doesImageExist(err) {
+		if (err) {
+			console.log("Sorry img was not found for: ".red, err.toString().red)
+		}
+	}
+}
 
 
 
@@ -176,6 +221,13 @@ function replacer(match, url) {
     }
 }
 
+function ts(str) {
+	return trailingSlash(str)
+}
+
+function trailingSlash(str) {
+    return str.replace(/\/$/,"") + "/"
+}
 
 
 
