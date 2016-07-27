@@ -148,9 +148,6 @@ function capitalizeFirstLetter(string) {
     return string.charAt(0).toUpperCase() + string.slice(1);
 }
 
-
-
-
 function getHTMLFomMarkdown(content) {
     var lines = content.split("\n")
     var result = lines.map(convertLine).join("")

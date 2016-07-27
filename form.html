@@ -6,7 +6,7 @@
     <title>Document</title>
 </head>
 <body>
-    <form action="" method="post" enctype="multipart/form-data" target="_blank">
+    <form action="" method="post" enctype="multipart/form-data" target="article">
         <div class="meta">
             <label for="meta-title">Title</label><input type="text" name="meta-title" value="{{meta-title}}">
             <label for="meta-description">Description</label><input type="text" name="meta-description" value="{{meta-description}}">
@@ -33,7 +33,7 @@
             <label for="banner-class">Banner class <span>(eg hd-5-family-cars)</span></label><input type="text" name="banner-class">
         </div>
         <div class="markdown">
-            <textarea name="markdown-entry" id="" cols="130" rows="80"></textarea>
+            <textarea name="markdown-entry" id="" cols="90" rows="80"></textarea>
         </div>
         <input type="submit" value="Create file" />
     </form>
@@ -49,7 +49,7 @@
         }
         .meta, .markdown, input[type="submit"] {
             float: left;
-            margin-right: 60px;
+            margin-right: 40px;
         }
         input, textarea, select {
             margin-bottom: 30px;
