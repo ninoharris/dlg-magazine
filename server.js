@@ -13,7 +13,7 @@ const imgTemplate = ('image-include-template.html')
 
 
 // const imgRegex = /IMG *([\w-_\/]+?)-? *"(.*)"?/
-const imgRegex = /IMG *\[(.+)\]( *\((.+)\))?/g
+const imgRegex = /IMG *\[(.+)\]( *\((.+)\))?/
 // https://regex101.com/r/vD9vB0/1
 // IMG *	IMG followed by any amount of spaces
 // ()		capture content inside, this is the filename
@@ -152,7 +152,7 @@ function capitalizeFirstLetter(string) {
 
 
 function getHTMLFomMarkdown(content) {
-    var lines = content.split("\n")
+    var lines = content.split("\r\n")
     var result = lines.map(convertLine).join("")
     return result
 }
@@ -161,10 +161,12 @@ function convertLine(line) {
 	var newLine
 	if(line.toUpperCase().indexOf("IMG") > -1) {
 		newLine = includeImg(line)
+	} else if (line.length == 0) {
+		return ""
 	} else {
 		newLine = includeBlank(marked(line))
 	}
-    return "\t\t\t\t" + newLine // Adds in tabs for editing later on
+    return "\n\t\t\t\t" + newLine // Adds in tabs for editing later on
 }
 
 function includeImg (line) {
