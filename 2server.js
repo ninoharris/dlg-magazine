@@ -10,7 +10,11 @@ const config = require('./config.json')
 const OUTPUT_PATH = ts(config["desktopPath"])
 const imgTemplate = ('image-include-template.html')
 
-
+// Used to get the IP address of the user...
+var ip
+require('dns').lookup(require('os').hostname(), function (err, add, fam) {
+  ip = add
+})
 
 // const imgRegex = /IMG *([\w-_\/]+?)-? *"(.*)"?/
 const imgRegex = /IMG *\[(.+)\]( *\((.+)\))?/
@@ -39,6 +43,12 @@ renderer.link = function (href, title, text) {
 }
 renderer.paragraph = function (text) {
 	return "<p>" + text + "</p>\n\n"
+}
+renderer.heading = function (text, lvl) {
+	return "<h" + lvl + ">" + text + "</h" + lvl + ">\n\n"
+}
+renderer.blockquote = function (quote) {
+	return "<blockquote>" + quote.replace("<p>", "").replace("</p>", "") + "</blockquote>"
 }
 
 
@@ -141,7 +151,7 @@ function getOutputFilePath(category, url, product) {
 
 function getProductionPath(category, url, product) {
     categoryFilePath = getCategoryFilePath(category, product)
-    return ts("http://dev.directline.com/") + ts(categoryFilePath) + url + ".html"
+    return ts(String("http://" + ip)) + ts(categoryFilePath) + url + ".html"
 }
 
 function getCategoryFilePath(category, product) {
